@@ -7,6 +7,7 @@ import { authRoutes } from "./routes/authRoutes.js";
 import { exploreRoutes } from "./routes/exploreRoutes.js";
 import { publicRoutes } from "./routes/publicRoutes.js";
 import { tripRoutes } from "./routes/tripRoutes.js";
+import { transportRoutes } from "./routes/transportRoutes.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
 
 export const app = express();
@@ -22,4 +23,5 @@ app.use("/api/trips", tripRoutes);
 app.use("/api/explore", exploreRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api/transport", transportRoutes);
 app.use(errorMiddleware);
