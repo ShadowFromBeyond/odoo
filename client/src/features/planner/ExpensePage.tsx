@@ -1,5 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { EmptyState } from "../../components/ui/EmptyState";
@@ -15,6 +17,7 @@ export function ExpensePage() {
   const { trips, selectedTripId, refreshTrip } = useTripStore();
   const trip = trips.find((item) => item.id === selectedTripId) ?? trips[0];
   if (!trip) return <EmptyState title="No expenses yet" body="Create a trip to estimate budgets and track expense categories." />;
+  const [isSavingBudget, setIsSavingBudget] = useState(false);
   const budget = trip.budget ?? { transportCost: 0, hotelCost: 0, activityCost: 0, mealCost: 0, miscellaneousCost: 0, totalCost: 0 };
   const rows = [
     { key: "transportCost", label: "Transport", value: budget.transportCost },
@@ -26,9 +29,17 @@ export function ExpensePage() {
   const dayTotals = trip.stops.map((stop) => ({ day: stop.cityName, total: stop.activities.reduce((sum, activity) => sum + activity.estimatedCost, 0) }));
 
   async function saveBudget(formData: FormData) {
-    const next = Object.fromEntries(rows.map((row) => [row.key, Number(formData.get(row.key) ?? 0)]));
-    await tripApi.budget(trip.id, next);
-    await refreshTrip();
+    setIsSavingBudget(true);
+    try {
+      const next = Object.fromEntries(rows.map((row) => [row.key, Number(formData.get(row.key) ?? 0)]));
+      await tripApi.budget(trip.id, next);
+      await refreshTrip();
+      toast.success("Budget saved successfully");
+    } catch (error) {
+      toast.error("Unable to save budget. Please try again.");
+    } finally {
+      setIsSavingBudget(false);
+    }
   }
 
   return (
@@ -38,7 +49,7 @@ export function ExpensePage() {
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <Card>
           <h3 className="mb-4 text-xl font-black">Expense table</h3>
-          <form onSubmit={(event) => { event.preventDefault(); void saveBudget(new FormData(event.currentTarget)); }} className="space-y-3">{rows.map((row) => <div key={row.key} className="grid grid-cols-[1fr_160px] items-center gap-3"><span className="font-semibold">{row.label}</span><Input name={row.key} type="number" defaultValue={row.value} /></div>)}<Button>Save budget</Button></form>
+          <form onSubmit={(event) => { event.preventDefault(); void saveBudget(new FormData(event.currentTarget)); }} className="space-y-3">{rows.map((row) => <div key={row.key} className="grid grid-cols-[1fr_160px] items-center gap-3"><span className="font-semibold">{row.label}</span><Input name={row.key} type="number" defaultValue={row.value} /></div>)}<Button type="submit" disabled={isSavingBudget}>{isSavingBudget ? "Saving..." : "Save budget"}</Button></form>
           <p className="mt-5 text-4xl font-black text-teal-700 dark:text-teal-300">{money(budget.totalCost)}</p>
         </Card>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-1">

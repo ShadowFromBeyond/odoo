@@ -148,10 +148,42 @@ export function MapPage() {
   }));
 
   const [tooltips, setTooltips] = useState<{ [key: string]: boolean }>({});
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const showGoogleMap = Boolean(
+    googleMapsApiKey && googleMapsApiKey !== "YOUR_GOOGLE_MAPS_API_KEY"
+  );
 
   const handleMarkerHover = (id: string, isHovering: boolean) => {
     setTooltips((prev) => ({ ...prev, [id]: isHovering }));
   };
+
+  if (!showGoogleMap) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg">
+            <Navigation className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Explore Map</h2>
+            <p className="text-sm text-slate-500">
+              Google Maps is unavailable because the API key is not configured.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
+          <h3 className="mb-4 text-lg font-bold text-slate-900">Setup required</h3>
+          <p className="mb-3 text-sm text-slate-600">
+            Add your Google Maps API key to <code className="rounded bg-slate-100 px-2 py-1">client/.env</code> as <code>VITE_GOOGLE_MAPS_API_KEY</code>.
+          </p>
+          <p className="text-sm text-slate-600">
+            Then restart the dev server and refresh this page.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -175,7 +207,7 @@ export function MapPage() {
         <div className="relative h-[520px] w-full">
           <GoogleMapReact
             ref={mapRef}
-            bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "" }}
+            bootstrapURLKeys={{ key: googleMapsApiKey }}
             defaultCenter={{ lat: 20, lng: 0 }}
             defaultZoom={2}
             yesIWantToUseGoogleMapApiInternals

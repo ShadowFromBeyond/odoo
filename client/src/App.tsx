@@ -6,7 +6,7 @@ import { AdminDashboardPage } from "./features/admin/AdminDashboardPage";
 import { LoginPage } from "./features/auth/LoginPage";
 import { RegisterPage } from "./features/auth/RegisterPage";
 import { CommunityFeedPage } from "./features/community/CommunityFeedPage";
-import { MapPage } from "./features/explore/MapPage";
+import { LeafletMapPage } from "./features/explore/LeafletMapPage";
 import { SearchPage } from "./features/explore/SearchPage";
 import { ChecklistPage } from "./features/planner/ChecklistPage";
 import { ExpensePage } from "./features/planner/ExpensePage";
@@ -39,7 +39,7 @@ export function App() {
           <Route path="/trips" element={<TripListingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/map" element={<MapPage />} />
+          <Route path="/map" element={<LeafletMapPage />} />
           <Route path="/community" element={<CommunityFeedPage />} />
           <Route path="/checklist" element={<ChecklistPage />} />
           <Route path="/notes" element={<NotesPage />} />
